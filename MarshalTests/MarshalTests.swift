@@ -132,10 +132,22 @@ class MarshalTests: XCTestCase {
                 expectation.fulfill()
             }
         }
-        
+
         self.waitForExpectations(timeout: 1, handler: nil)
     }
-    
+
+    func testNSDictionaryWithPartiallyMatchedKeyPath() {
+        let dictionary: NSDictionary = ["thumb" : "https://www.google.com"]
+        do {
+            let stringUrl: String = try dictionary.value(for: "thumb.src")
+            XCTFail("Expected KeyNotFound error.")
+        } catch Marshal.MarshalError.keyNotFound {
+            // expected
+        } catch {
+            XCTFail("Unexpected error")
+        }
+    }
+
     func testDicionary() {
         let path = Bundle(for: type(of: self)).path(forResource: "TestDictionary", ofType: "json")!
         var data = try! Data(contentsOf: URL(fileURLWithPath: path))
